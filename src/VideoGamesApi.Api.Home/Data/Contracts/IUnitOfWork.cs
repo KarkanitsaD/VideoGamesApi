@@ -8,5 +8,7 @@ namespace VideoGamesApi.Api.Home.Data.Contracts
         int SaveChanges();
 
         Task<int> SaveChangesAsync();
+
+        IRepository<TEntity, TKey> GetRepository<TEntity, TKey>() where TEntity : class, IEntity<TKey>;
     }
 }

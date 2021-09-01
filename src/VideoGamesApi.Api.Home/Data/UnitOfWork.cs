@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VideoGamesApi.Api.Home.Data.Contracts;
@@ -9,21 +10,16 @@ namespace VideoGamesApi.Api.Home.Data
     {
         private readonly DbContext _context;
         private bool _disposed;
-
+        private readonly Dictionary<string, object> _repositories;
         public UnitOfWork(DbContext context)
         {
             _context = context;
+            _repositories = new Dictionary<string, object>();
         }
 
         ~UnitOfWork()
         {
             Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         public int SaveChanges()
@@ -34,6 +30,20 @@ namespace VideoGamesApi.Api.Home.Data
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+        public IRepository<TEntity, TKey> GetRepository<TEntity, TKey>() where TEntity : class, IEntity<TKey>
+        {
+            var key = typeof(TEntity).ToString();
+            if (!_repositories.ContainsKey(key))
+                _repositories.Add(key, new Repository<TEntity, TKey>(_context));
+            return (IRepository<TEntity, TKey>)_repositories[key];
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
