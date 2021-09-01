@@ -2,7 +2,7 @@
 {
     public interface IQueryModel<TKey>
     {
-        TKey Id { get; set; }
+        TKey? Id { get; set; }
 
         int Index { get; set; }
 
