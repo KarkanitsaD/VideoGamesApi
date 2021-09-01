@@ -24,8 +24,6 @@ namespace VideoGamesApi.Api.Home.Data.Contracts
 
         TEntity Update(TEntity entity);
 
-        Task<TEntity> UpdateAsync(TEntity entity);
-
         TEntity Insert(TEntity entity);
 
         void Insert(IEnumerable<TEntity> entities);
@@ -35,8 +33,6 @@ namespace VideoGamesApi.Api.Home.Data.Contracts
         Task InsertAsync(IEnumerable<TEntity> entities);
 
         TEntity Delete(TEntity entity);
-
-        Task<TEntity> DeleteAsync(TEntity entity);
 
         int Count(QueryParameters<TEntity, TKey> parameters = null);
 
