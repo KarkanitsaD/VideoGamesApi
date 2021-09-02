@@ -2,10 +2,8 @@
 
 namespace VideoGamesApi.Api.Home.Business.QueryModels
 {
-    public abstract class QueryModel<TKey> : IQueryModel<TKey>
+    public abstract class QueryModel
     {
-        public TKey Id { get; set; }
-
         public int Index { get; set; }
 
         public int Size { get; set; }
@@ -13,5 +11,11 @@ namespace VideoGamesApi.Api.Home.Business.QueryModels
         public bool IsValidPageModel => Size > 0 && Index >= 0;
 
         public SortOrder SortOrder { get; set; } = SortOrder.Ascending;
+    }
+
+    public enum SortOrder
+    {
+        Ascending = 0,
+        Descending = 0
     }
 }
