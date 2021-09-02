@@ -64,13 +64,13 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected override FilterRule<CompanyEntity, int> GetFilterRule(QueryModel model)
         {
-            var countryModel = (CompanyQueryModel)model;
+            var companyModel = (CompanyQueryModel)model;
 
             var filterRule = new FilterRule<CompanyEntity, int>
             {
-                Expression = country =>
-                    (countryModel.Id != null && country.Id == countryModel.Id || countryModel.Id == null)
-                    && (countryModel.Title != null && country.Title.Contains(countryModel.Title) || countryModel.Title == null)
+                Expression = company =>
+                    (companyModel.Id != null && company.Id == companyModel.Id || companyModel.Id == null)
+                    && (companyModel.Title != null && company.Title.Contains(companyModel.Title) || companyModel.Title == null)
             };
 
             return filterRule;
