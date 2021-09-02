@@ -5,24 +5,24 @@ using SortOrder = VideoGamesApi.Api.Home.Business.QueryModels.SortOrder;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public abstract class Service
+    public abstract class Service<TEntity, TKey> where TEntity : class, IEntity<TKey>
     {
-        
-        private SortRule<TEntity, TKey> GetSortRule<TEntity, TKey>(QueryModel model) where TEntity : class, IEntity<TKey>
+        private SortRule<TEntity, TKey> GetSortRule(QueryModel model)
         {
-            var sortRule = new SortRule<TEntity, TKey>
-            {
-                Order = model.SortOrder == SortOrder.Ascending
+            var sortRule = new SortRule<TEntity, TKey>();
+
+            if (model.SortOrder == null)
+                return sortRule;
+
+            sortRule.Order = model.SortOrder == SortOrder.Ascending
                 ? Data.Query.SortOrder.Ascending
-                : Data.Query.SortOrder.Descending
-            };
-            DefineSortExpression(model, sortRule);
+                : Data.Query.SortOrder.Descending;
+            DefineSortExpression(sortRule);
 
             return sortRule;
         }
 
-        protected abstract void DefineSortExpression<TEntity, TKey>(QueryModel model, SortRule<TEntity, TKey> sortRule)
-            where TEntity : class, IEntity<TKey>;
+        protected abstract void DefineSortExpression(SortRule<TEntity, TKey> sortRule);
 
         private PageRule GetPageRule(QueryModel model)
         {
@@ -35,7 +35,6 @@ namespace VideoGamesApi.Api.Home.Business
             return pageRule;
         }
 
-        protected abstract FilterRule<TEntity, TKey> GetFilterRule<TEntity, TKey>(QueryModel model)
-            where TEntity : class, IEntity<TKey>;
+        protected abstract FilterRule<TEntity, TKey> GetFilterRule(QueryModel model);
     }
 }

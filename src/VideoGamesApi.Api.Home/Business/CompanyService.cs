@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
@@ -6,10 +8,11 @@ using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
+using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class CompanyService : ICompanyService
+    public class CompanyService : Service<CompanyEntity, int>, ICompanyService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -50,6 +53,27 @@ namespace VideoGamesApi.Api.Home.Business
         public Task<CompanyDto> RemoveAsync(CompanyDto dto)
         {
             throw new System.NotImplementedException();
+        }
+
+        protected override void DefineSortExpression(SortRule<CompanyEntity, int> sortRule)
+        {
+            Expression<Func<CompanyEntity, string>> expression = company => company.Title;
+
+            sortRule.Expression = expression;
+        }
+
+        protected override FilterRule<CompanyEntity, int> GetFilterRule(QueryModel model)
+        {
+            var countryModel = (CompanyQueryModel)model;
+
+            var filterRule = new FilterRule<CompanyEntity, int>
+            {
+                Expression = country =>
+                    (countryModel.Id != null && country.Id == countryModel.Id || countryModel.Id == null)
+                    && (countryModel.Title != null && country.Title.Contains(countryModel.Title) || countryModel.Title == null)
+            };
+
+            return filterRule;
         }
     }
 }

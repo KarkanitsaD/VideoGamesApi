@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using VideoGamesApi.Api.Home.Data.Contracts;
+using VideoGamesApi.Api.Home.Data.Models;
 
 namespace VideoGamesApi.Api.Home.Data.Query
 {
