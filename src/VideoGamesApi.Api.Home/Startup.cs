@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Mapping;
+using VideoGamesApi.Api.Home.Contracts;
+using VideoGamesApi.Api.Home.Mapping;
 
 namespace VideoGamesApi.Api.Home
 {
@@ -23,6 +25,7 @@ namespace VideoGamesApi.Api.Home
             services.AddSingleton(mapper);
 
             services.AddSingleton<IBusinessMapper, BusinessMapper>();
+            services.AddSingleton<IPresentationMapper, PresentationMapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
