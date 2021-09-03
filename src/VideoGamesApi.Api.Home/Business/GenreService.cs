@@ -81,7 +81,7 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<GenreDto> RemoveAsync(GenreDto dto)
+        public Task<GenreDto> RemoveAsync(int id)
         {
             throw new System.NotImplementedException();
         }

@@ -82,7 +82,7 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<CompanyDto> RemoveAsync(CompanyDto dto)
+        public Task<CompanyDto> RemoveAsync(int id)
         {
             throw new System.NotImplementedException();
         }

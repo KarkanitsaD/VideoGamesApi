@@ -17,6 +17,6 @@ namespace VideoGamesApi.Api.Home.Business.Contracts
 
         Task CreateListAsync(IEnumerable<CountryDto> dtos);
 
-        Task<CountryDto> RemoveAsync(CountryDto dto);
+        Task<CountryDto> RemoveAsync(int id);
     }
 }

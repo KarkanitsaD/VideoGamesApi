@@ -17,6 +17,6 @@ namespace VideoGamesApi.Api.Home.Business.Contracts
 
         Task CreateListAsync(IEnumerable<GenreDto> dtos);
 
-        Task<GenreDto> RemoveAsync(GenreDto dto);
+        Task<GenreDto> RemoveAsync(int id);
     }
 }
