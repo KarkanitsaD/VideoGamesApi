@@ -1,12 +1,15 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VideoGamesApi.Api.Home.Business;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Mapping;
 using VideoGamesApi.Api.Home.Contracts;
+using VideoGamesApi.Api.Home.Data;
+using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Mapping;
 
 namespace VideoGamesApi.Api.Home
@@ -26,6 +29,13 @@ namespace VideoGamesApi.Api.Home
 
             services.AddSingleton<IBusinessMapper, BusinessMapper>();
             services.AddSingleton<IPresentationMapper, PresentationMapper>();
+            services.AddScoped<DbContext, Context>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<ICountryService, CountryService>();
+            services.AddScoped<IVideoGameService, VideoGameService>();
+            services.AddScoped<IGenreService, GenreService>();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,10 +50,7 @@ namespace VideoGamesApi.Api.Home
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
         }
     }
