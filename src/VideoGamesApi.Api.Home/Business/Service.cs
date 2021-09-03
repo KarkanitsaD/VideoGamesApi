@@ -36,5 +36,17 @@ namespace VideoGamesApi.Api.Home.Business
         }
 
         protected abstract FilterRule<TEntity, TKey> GetFilterRule(QueryModel model);
+
+        protected QueryParameters<TEntity, TKey> GetQueryParameters(QueryModel model)
+        {
+            var queryParameters = new QueryParameters<TEntity, TKey>
+            {
+                FilterRule = GetFilterRule(model),
+                SortRule = GetSortRule(model),
+                PageRule = GetPageRule(model)
+            };
+
+            return queryParameters;
+        }
     }
 }

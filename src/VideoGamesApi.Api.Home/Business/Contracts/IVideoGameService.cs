@@ -9,13 +9,13 @@ namespace VideoGamesApi.Api.Home.Business.Contracts
     {
         Task<VideoGameDto> GetAsync(VideoGameQueryModel queryModel);
 
-        Task<VideoGameDto> GetListAsync(VideoGameQueryModel queryModel);
+        Task<IList<VideoGameDto>> GetListAsync(VideoGameQueryModel queryModel);
 
-        VideoGameDto Modify(VideoGameDto dto);
+        Task<VideoGameDto> Modify(VideoGameDto dto);
 
         Task<VideoGameDto> CreateAsync(VideoGameDto dto);
 
-        Task<VideoGameDto> CreateListAsync(IEnumerable<VideoGameDto> dtos);
+        Task CreateListAsync(IEnumerable<VideoGameDto> dtos);
 
         Task<VideoGameDto> RemoveAsync(VideoGameDto dto);
     }

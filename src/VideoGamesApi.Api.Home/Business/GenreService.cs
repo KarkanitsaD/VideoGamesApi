@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
 using VideoGamesApi.Api.Home.Data.Query;
 
@@ -12,29 +13,72 @@ namespace VideoGamesApi.Api.Home.Business
 {
     public class GenreService : Service<GenreEntity, int>, IGenreService
     {
-        public Task<GenreDto> GetAsync(GenreQueryModel queryModel)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBusinessMapper _mapper;
+
+        public GenreService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
         {
-            throw new System.NotImplementedException();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public Task<GenreDto> GetListAsync(GenreQueryModel queryModel)
+        public async Task<GenreDto> GetAsync(GenreQueryModel queryModel)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entity = await repository.GetAsync(queryParameters);
+
+            return _mapper.Map<GenreEntity, GenreDto>(entity);
         }
 
-        public GenreDto Modify(GenreDto dto)
+        public async Task<IList<GenreDto>> GetListAsync(GenreQueryModel queryModel)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entities = await repository.GetListAsync(queryParameters);
+
+            return _mapper.Map<IList<GenreEntity>, IList<GenreDto>>(entities);
         }
 
-        public Task<GenreDto> CreateAsync(GenreDto dto)
+        public async Task<GenreDto> Modify(GenreDto dto)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+
+            var entity = _mapper.Map<GenreDto, GenreEntity>(dto);
+
+            var entityToReturn = repository.Update(entity);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<GenreEntity, GenreDto>(entityToReturn);
         }
 
-        public Task<GenreDto> CreateListAsync(IEnumerable<GenreDto> dtos)
+        public async Task<GenreDto> CreateAsync(GenreDto dto)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+
+            var entity = _mapper.Map<GenreDto, GenreEntity>(dto);
+
+            var entityToReturn = await repository.InsertAsync(entity);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<GenreEntity, GenreDto>(entityToReturn);
+        }
+
+        public async Task CreateListAsync(IEnumerable<GenreDto> dtos)
+        {
+            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+
+            var entities = _mapper.Map<IEnumerable<GenreDto>, IEnumerable<GenreEntity>>(dtos);
+
+            await repository.InsertAsync(entities);
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public Task<GenreDto> RemoveAsync(GenreDto dto)

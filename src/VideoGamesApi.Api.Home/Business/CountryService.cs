@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
 using VideoGamesApi.Api.Home.Data.Query;
 
@@ -12,29 +13,72 @@ namespace VideoGamesApi.Api.Home.Business
 {
     public class CountryService : Service<CountryEntity, int>, ICountryService
     {
-        public Task<CountryDto> GetAsync(CountryQueryModel queryModel)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBusinessMapper _mapper;
+
+        public CountryService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
         {
-            throw new System.NotImplementedException();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public Task<CountryDto> GetListAsync(CountryQueryModel queryModel)
+        public async Task<CountryDto> GetAsync(CountryQueryModel queryModel)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entity = await repository.GetAsync(queryParameters);
+
+            return _mapper.Map<CountryEntity, CountryDto>(entity);
         }
 
-        public CountryDto Modify(CountryDto dto)
+        public async Task<IList<CountryDto>> GetListAsync(CountryQueryModel queryModel)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entities = await repository.GetListAsync(queryParameters);
+
+            return _mapper.Map<IList<CountryEntity>, IList<CountryDto>>(entities);
         }
 
-        public Task<CountryDto> CreateAsync(CountryDto dto)
+        public async Task<CountryDto> Modify(CountryDto dto)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+
+            var entity = _mapper.Map<CountryDto, CountryEntity>(dto);
+
+            var entityToReturn = repository.Update(entity);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<CountryEntity, CountryDto>(entityToReturn);
         }
 
-        public Task<CountryDto> CreateListAsync(IEnumerable<CountryDto> dtos)
+        public async Task<CountryDto> CreateAsync(CountryDto dto)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+
+            var entity = _mapper.Map<CountryDto, CountryEntity>(dto);
+
+            var entityToReturn = await repository.InsertAsync(entity);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<CountryEntity, CountryDto>(entityToReturn);
+        }
+
+        public async Task CreateListAsync(IEnumerable<CountryDto> dtos)
+        {
+            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+
+            var entities = _mapper.Map<IEnumerable<CountryDto>, IEnumerable<CountryEntity>>(dtos);
+
+            await repository.InsertAsync(entities);
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public Task<CountryDto> RemoveAsync(CountryDto dto)

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
 using VideoGamesApi.Api.Home.Data.Query;
 
@@ -12,29 +13,72 @@ namespace VideoGamesApi.Api.Home.Business
 {
     public class VideoGameService : Service<VideoGameEntity, int>, IVideoGameService
     {
-        public Task<VideoGameDto> GetAsync(VideoGameQueryModel queryModel)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBusinessMapper _mapper;
+
+        public VideoGameService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
         {
-            throw new System.NotImplementedException();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public Task<VideoGameDto> GetListAsync(VideoGameQueryModel queryModel)
+        public async Task<VideoGameDto> GetAsync(VideoGameQueryModel queryModel)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entity = await repository.GetAsync(queryParameters);
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(entity);
         }
 
-        public VideoGameDto Modify(VideoGameDto dto)
+        public async Task<IList<VideoGameDto>> GetListAsync(VideoGameQueryModel queryModel)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entities = await repository.GetListAsync(queryParameters);
+
+            return _mapper.Map<IList<VideoGameEntity>, IList<VideoGameDto>>(entities);
         }
 
-        public Task<VideoGameDto> CreateAsync(VideoGameDto dto)
+        public async Task<VideoGameDto> Modify(VideoGameDto dto)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+
+            var entity = _mapper.Map<VideoGameDto, VideoGameEntity>(dto);
+
+            var entityToReturn = repository.Update(entity);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(entityToReturn);
         }
 
-        public Task<VideoGameDto> CreateListAsync(IEnumerable<VideoGameDto> dtos)
+        public async Task<VideoGameDto> CreateAsync(VideoGameDto dto)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+
+            var entity = _mapper.Map<VideoGameDto, VideoGameEntity>(dto);
+
+            var entityToReturn = await repository.InsertAsync(entity);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(entityToReturn);
+        }
+
+        public async Task CreateListAsync(IEnumerable<VideoGameDto> dtos)
+        {
+            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+
+            var entities = _mapper.Map<IEnumerable<VideoGameDto>, IEnumerable<VideoGameEntity>>(dtos);
+
+            await repository.InsertAsync(entities);
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public Task<VideoGameDto> RemoveAsync(VideoGameDto dto)
