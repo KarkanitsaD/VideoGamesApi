@@ -81,23 +81,56 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<CountryDto> RemoveAsync(int id)
+        public async Task<CountryDto> RemoveAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+
+            var queryParameters = new QueryParameters<CountryEntity, int>
+            {
+                FilterRule = new FilterRule<CountryEntity, int>
+                {
+                    Expression = country => country.Id == id
+                }
+            };
+
+            var entityToDelete = await repository.GetAsync(queryParameters);
+
+            if (entityToDelete == null)
+                throw new KeyNotFoundException();
+
+            var companyQueryParameters = new QueryParameters<CompanyEntity, int>
+            {
+                FilterRule = new FilterRule<CompanyEntity, int>
+                {
+                    Expression = company => company.CountryId == id
+                }
+            };
+
+            var companiesToModify =
+                await _unitOfWork.GetRepository<CompanyEntity, int>().GetListAsync(companyQueryParameters);
+
+            foreach (var company in companiesToModify)
+            {
+                company.CountryId = null;
+            }
+
+            var deletedEntity = repository.Delete(entityToDelete);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<CountryEntity, CountryDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<CountryEntity, int> sortRule)
         {
-            Expression<Func<CountryEntity, string>> expression = country => country.Title;
-
-            sortRule.Expression = expression;
+            sortRule.Expression = country => country.Title;
         }
 
         protected override FilterRule<CountryEntity, int> GetFilterRule(QueryModel model)
         {
             var countryModel = (CountryQueryModel)model;
 
-            var filterRule = new FilterRule<CountryEntity, int>()
+            var filterRule = new FilterRule<CountryEntity, int>
             {
                 Expression = country =>
                     (countryModel.Id != null && country.Id == countryModel.Id || countryModel.Id == null)

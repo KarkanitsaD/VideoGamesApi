@@ -88,9 +88,7 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected override void DefineSortExpression(SortRule<VideoGameEntity, int> sortRule)
         {
-            Expression<Func<VideoGameEntity, string>> expression = game => game.Title;
-
-            sortRule.Expression = expression;
+            sortRule.Expression = game => game.Title;
         }
 
         protected override FilterRule<VideoGameEntity, int> GetFilterRule(QueryModel model)
