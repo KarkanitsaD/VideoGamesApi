@@ -10,7 +10,7 @@ namespace VideoGamesApi.Api.Home.Business.QueryModels
 
         public bool IsValidPageModel => Size > 0 && Index >= 0;
 
-        public SortOrder SortOrder { get; set; } = SortOrder.Ascending;
+        public SortOrder? SortOrder { get; set; }
     }
 
     public enum SortOrder
