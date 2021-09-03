@@ -82,16 +82,33 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<CompanyDto> RemoveAsync(CompanyDto dto)
+        public async Task<CompanyDto> RemoveAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
+
+            var queryParameters = new QueryParameters<CompanyEntity, int>
+            {
+                FilterRule = new FilterRule<CompanyEntity, int>
+                {
+                    Expression = company => company.Id == id
+                }
+            };
+
+            var entityToDelete = await repository.GetAsync(queryParameters);
+
+            if (entityToDelete == null)
+                throw new KeyNotFoundException();
+
+            var deletedEntity = repository.Delete(entityToDelete);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<CompanyEntity, CompanyDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<CompanyEntity, int> sortRule)
         {
-            Expression<Func<CompanyEntity, string>> expression = company => company.Title;
-
-            sortRule.Expression = expression;
+            sortRule.Expression = company => company.Title;
         }
 
         protected override FilterRule<CompanyEntity, int> GetFilterRule(QueryModel model)

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
@@ -81,21 +79,40 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<GenreDto> RemoveAsync(GenreDto dto)
+        public async Task<GenreDto> RemoveAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+
+            var queryParameters = new QueryParameters<GenreEntity, int>
+            {
+                FilterRule = new FilterRule<GenreEntity, int>
+                {
+                    Expression = genre => genre.Id == id
+                }
+            };
+
+            var entityToDelete = await repository.GetAsync(queryParameters);
+
+            if (entityToDelete == null)
+                throw new KeyNotFoundException();
+
+            var deletedEntity = repository.Delete(entityToDelete);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<GenreEntity, GenreDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<GenreEntity, int> sortRule)
         {
-            Expression<Func<GenreEntity, string>> expression = genre => genre.Title;
+            sortRule.Expression = genre => genre.Title;
         }
 
         protected override FilterRule<GenreEntity, int> GetFilterRule(QueryModel model)
         {
             var genreModel = (GenreQueryModel)model;
 
-            var filterExpression = new FilterRule<GenreEntity, int>()
+            var filterExpression = new FilterRule<GenreEntity, int>
             {
                 Expression = genre =>
                     (genreModel.Id != null && genre.Id == genreModel.Id || genreModel.Id == null)

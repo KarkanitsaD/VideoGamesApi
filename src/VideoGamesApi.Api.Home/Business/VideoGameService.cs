@@ -81,16 +81,14 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<VideoGameDto> RemoveAsync(VideoGameDto dto)
+        public Task<VideoGameDto> RemoveAsync(int id)
         {
             throw new System.NotImplementedException();
         }
 
         protected override void DefineSortExpression(SortRule<VideoGameEntity, int> sortRule)
         {
-            Expression<Func<VideoGameEntity, string>> expression = game => game.Title;
-
-            sortRule.Expression = expression;
+            sortRule.Expression = game => game.Title;
         }
 
         protected override FilterRule<VideoGameEntity, int> GetFilterRule(QueryModel model)
