@@ -23,6 +23,7 @@ namespace VideoGamesApi.Api.Home
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new BusinessMappingProfile());
+                mc.AddProfile(new PresentationMappingProfile());
             });
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
