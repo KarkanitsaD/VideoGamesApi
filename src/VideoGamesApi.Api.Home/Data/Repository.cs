@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,8 @@ namespace VideoGamesApi.Api.Home.Data
 
         public PageResult<TEntity> GetPageList(QueryParameters<TEntity, TKey> parameters)
         {
+            VerifyPageRule(parameters);
+
             var items = Query(parameters).ToList();
 
             var pageResult = new PageResult<TEntity>()
@@ -55,6 +58,8 @@ namespace VideoGamesApi.Api.Home.Data
 
         public async Task<PageResult<TEntity>> GetPageListAsync(QueryParameters<TEntity, TKey> parameters)
         {
+            VerifyPageRule(parameters);
+
             var items = await Query(parameters).ToListAsync();
 
             var pageResult = new PageResult<TEntity>()
@@ -145,6 +150,12 @@ namespace VideoGamesApi.Api.Home.Data
                 query = query.Skip(queryParameters.PageRule.Size * queryParameters.PageRule.Index).Take(queryParameters.PageRule.Size);
 
             return query;
+        }
+
+        protected void VerifyPageRule(QueryParameters<TEntity, TKey> queryParameters)
+        {
+            if (queryParameters == null || queryParameters.PageRule == null || !queryParameters.PageRule.IsValid)
+                throw new ArgumentException();
         }
     }
 }
