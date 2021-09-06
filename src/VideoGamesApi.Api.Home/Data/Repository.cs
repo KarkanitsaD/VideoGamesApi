@@ -49,7 +49,7 @@ namespace VideoGamesApi.Api.Home.Data
             {
                 PageIndex = parameters.PageRule.Index,
                 PageSIze = parameters.PageRule.Size,
-                CountItems = items.Count(),
+                CountItems = items.Count,
                 Items = items
             };
 
@@ -66,7 +66,7 @@ namespace VideoGamesApi.Api.Home.Data
             {
                 PageIndex = parameters.PageRule.Index,
                 PageSIze = parameters.PageRule.Size,
-                CountItems = items.Count(),
+                CountItems = items.Count,
                 Items = items
             };
 

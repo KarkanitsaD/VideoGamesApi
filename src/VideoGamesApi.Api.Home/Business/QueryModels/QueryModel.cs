@@ -18,6 +18,6 @@ namespace VideoGamesApi.Api.Home.Business.QueryModels
     public enum SortOrder
     {
         Ascending = 0,
-        Descending = 0
+        Descending = 1
     }
 }
