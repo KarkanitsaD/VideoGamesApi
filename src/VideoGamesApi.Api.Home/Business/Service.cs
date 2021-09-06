@@ -10,9 +10,6 @@ namespace VideoGamesApi.Api.Home.Business
     {
         private SortRule<TEntity, TKey> GetSortRule(QueryModel model)
         {
-            if (model == null) 
-                throw new ArgumentNullException($"{nameof(model)} can't be null");
-
             var sortRule = new SortRule<TEntity, TKey>();
 
             if (!model.IsValidSortModel)
@@ -45,6 +42,9 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected QueryParameters<TEntity, TKey> GetQueryParameters(QueryModel model)
         {
+            if (model == null)
+                throw new ArgumentNullException($"{nameof(model)}");
+
             var queryParameters = new QueryParameters<TEntity, TKey>
             {
                 FilterRule = GetFilterRule(model),
