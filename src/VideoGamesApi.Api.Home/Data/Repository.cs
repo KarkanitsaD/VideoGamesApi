@@ -49,7 +49,7 @@ namespace VideoGamesApi.Api.Home.Data
             {
                 PageIndex = parameters.PageRule.Index,
                 PageSIze = parameters.PageRule.Size,
-                CountItems = items.Count(),
+                CountItems = items.Count,
                 Items = items
             };
 
@@ -66,7 +66,7 @@ namespace VideoGamesApi.Api.Home.Data
             {
                 PageIndex = parameters.PageRule.Index,
                 PageSIze = parameters.PageRule.Size,
-                CountItems = items.Count(),
+                CountItems = items.Count,
                 Items = items
             };
 
@@ -154,8 +154,14 @@ namespace VideoGamesApi.Api.Home.Data
 
         protected void VerifyPageRule(QueryParameters<TEntity, TKey> queryParameters)
         {
-            if (queryParameters == null || queryParameters.PageRule == null || !queryParameters.PageRule.IsValid)
-                throw new ArgumentException();
+            if (queryParameters == null)
+                throw new ArgumentNullException(nameof(queryParameters));
+
+            if (queryParameters.PageRule == null)
+                throw new ArgumentException("PageRule can't be null.", nameof(queryParameters));
+
+            if (!queryParameters.PageRule.IsValid)
+                throw new ArgumentException("PageRule is not valid.", nameof(queryParameters));
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
@@ -81,13 +80,35 @@ namespace VideoGamesApi.Api.Home.Business
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task<VideoGameDto> RemoveAsync(int id)
+        public async Task<VideoGameDto> RemoveAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+
+            var queryParameters = new QueryParameters<VideoGameEntity, int>
+            {
+                FilterRule = new FilterRule<VideoGameEntity, int>
+                {
+                    Expression = game => game.Id == id
+                }
+            };
+
+            var entityToDelete = await repository.GetAsync(queryParameters);
+
+            if (entityToDelete == null)
+                throw new KeyNotFoundException();
+
+            var deletedEntity = repository.Delete(entityToDelete);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<VideoGameEntity, int> sortRule)
         {
+            if (sortRule == null)
+                throw new ArgumentNullException(nameof(sortRule));
+
             sortRule.Expression = game => game.Title;
         }
 
@@ -100,7 +121,7 @@ namespace VideoGamesApi.Api.Home.Business
                 Expression = game =>
                     (gameModel.Id != null && game.Id == gameModel.Id || gameModel.Id == null)
                     && (gameModel.MinRating != null && game.Rating > gameModel.MinRating || gameModel.MinRating == null)
-                    && (gameModel.Title != null && game.Title.Contains(gameModel.Title) || gameModel.Title == null)
+                    && (gameModel.Title != null && game.Title.Contains(gameModel.Title, StringComparison.Ordinal) || gameModel.Title == null)
             };
 
             return filterRule;

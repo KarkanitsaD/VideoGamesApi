@@ -1,4 +1,5 @@
-﻿using VideoGamesApi.Api.Home.Business.QueryModels;
+﻿using System;
+using VideoGamesApi.Api.Home.Business.QueryModels;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Query;
 using SortOrder = VideoGamesApi.Api.Home.Business.QueryModels.SortOrder;
@@ -11,7 +12,7 @@ namespace VideoGamesApi.Api.Home.Business
         {
             var sortRule = new SortRule<TEntity, TKey>();
 
-            if (model.SortOrder == null)
+            if (!model.IsValidSortModel)
                 return sortRule;
 
             sortRule.Order = model.SortOrder == SortOrder.Ascending
@@ -24,13 +25,15 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected abstract void DefineSortExpression(SortRule<TEntity, TKey> sortRule);
 
-        private PageRule GetPageRule(QueryModel model)
+        private static PageRule GetPageRule(QueryModel model)
         {
-            var pageRule = new PageRule()
-            {
-                Index = model.Index,
-                Size = model.Size
-            };
+            var pageRule = new PageRule();
+
+            if (!model.IsValidPageModel)
+                return pageRule;
+
+            pageRule.Index = model.Index;
+            pageRule.Size = model.Size;
 
             return pageRule;
         }
@@ -39,6 +42,9 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected QueryParameters<TEntity, TKey> GetQueryParameters(QueryModel model)
         {
+            if (model == null)
+                throw new ArgumentNullException($"{nameof(model)}");
+
             var queryParameters = new QueryParameters<TEntity, TKey>
             {
                 FilterRule = GetFilterRule(model),

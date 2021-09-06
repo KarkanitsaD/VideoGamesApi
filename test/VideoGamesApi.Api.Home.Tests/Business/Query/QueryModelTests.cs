@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Tests.Business.Fakes;
 using Xunit;
 
 namespace VideoGamesApi.Api.Home.Tests.Business.Query
