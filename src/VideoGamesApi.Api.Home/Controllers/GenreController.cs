@@ -62,7 +62,7 @@ namespace VideoGamesApi.Api.Home.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<GenreModel> Put(int id, [FromQuery] GenreModel model)
+        public async Task<GenreModel> Put(int id, [FromBody] GenreModel model)
         {
             var dto = _mapper.Map<GenreModel, GenreDto>(model);
 

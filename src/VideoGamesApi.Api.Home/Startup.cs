@@ -11,11 +11,19 @@ using VideoGamesApi.Api.Home.Contracts;
 using VideoGamesApi.Api.Home.Data;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Mapping;
+using Microsoft.Extensions.Configuration;
 
 namespace VideoGamesApi.Api.Home
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -28,6 +36,8 @@ namespace VideoGamesApi.Api.Home
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
+            services.AddDbContext<Context>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString")));
             services.AddSingleton<IBusinessMapper, BusinessMapper>();
             services.AddSingleton<IPresentationMapper, PresentationMapper>();
             services.AddScoped<DbContext, Context>();
