@@ -121,7 +121,7 @@ namespace VideoGamesApi.Api.Home.Business
             {
                 Expression = company =>
                     (companyModel.Id != null && company.Id == companyModel.Id || companyModel.Id == null)
-                    && (companyModel.Title != null && company.Title.Contains(companyModel.Title, StringComparison.Ordinal) || companyModel.Title == null)
+                    && (companyModel.Title != null && company.Title.Contains(companyModel.Title) || companyModel.Title == null)
             };
 
             return filterRule;

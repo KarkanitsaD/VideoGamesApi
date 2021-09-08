@@ -88,7 +88,7 @@ namespace VideoGamesApi.Api.Home.Data
             //TODO: read more about update
             _set.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
-            
+
             return entity;
         }
 

@@ -121,7 +121,7 @@ namespace VideoGamesApi.Api.Home.Business
                 Expression = game =>
                     (gameModel.Id != null && game.Id == gameModel.Id || gameModel.Id == null)
                     && (gameModel.MinRating != null && game.Rating > gameModel.MinRating || gameModel.MinRating == null)
-                    && (gameModel.Title != null && game.Title.Contains(gameModel.Title, StringComparison.Ordinal) || gameModel.Title == null)
+                    && (gameModel.Title != null && game.Title.Contains(gameModel.Title) || gameModel.Title == null)
             };
 
             return filterRule;
