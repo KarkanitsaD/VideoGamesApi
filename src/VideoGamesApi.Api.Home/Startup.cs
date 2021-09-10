@@ -35,17 +35,23 @@ namespace VideoGamesApi.Api.Home
             });
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
+            // replace your mapper setup with this one 
+            // https://www.codementor.io/@zedotech/how-to-using-automapper-on-asp-net-core-3-0-via-dependencyinjection-zq497lzsq
 
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString")));
-            services.AddSingleton<IBusinessMapper, BusinessMapper>();
-            services.AddSingleton<IPresentationMapper, PresentationMapper>();
-            services.AddScoped<DbContext, Context>();
+            services.AddSingleton<IBusinessMapper, BusinessMapper>(); // ???
+            services.AddSingleton<IPresentationMapper, PresentationMapper>(); // ???
+            services.AddScoped<DbContext, Context>(); // ?????
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICountryService, CountryService>();
-            services.AddScoped<IVideoGameService, VideoGameService>();
-            services.AddScoped<IGenreService, GenreService>();
+            services.AddScoped<IVideoGameService, VideoGameService>(); // why it is AddScoped for usual service?
+            services.AddTransient<IGenreService, GenreService>();
+
+            // migrate services configuration like ` services.AddTransient<IGenreService, GenreService>(); ` to business layer
+            // migrate UnitOfWork configuration to data layer
+            // try to keep Startup.cs file clean
             services.AddControllers();
         }
 
