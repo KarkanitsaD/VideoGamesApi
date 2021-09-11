@@ -32,7 +32,7 @@ namespace VideoGamesApi.Api.Home.Tests.Data.Repository
             new() { Id = 1, FakeFieldOne = "" },
         };
 
-        public Repository<TEntity, TKey> GetRepository<TEntity, TKey>(ICollection<TEntity> items)
+        private Repository<TEntity, TKey> GetRepository<TEntity, TKey>(ICollection<TEntity> items)
             where TEntity : class, IEntity<TKey>
         {
             var mockData = items.AsQueryable().BuildMock();

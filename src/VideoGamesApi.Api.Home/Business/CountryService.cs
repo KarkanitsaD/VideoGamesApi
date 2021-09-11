@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
@@ -42,7 +43,7 @@ namespace VideoGamesApi.Api.Home.Business
             return _mapper.Map<IList<CountryEntity>, IList<CountryDto>>(entities);
         }
 
-        public async Task<CountryDto> Modify(CountryDto dto)
+        public async Task<CountryDto> UpdateAsync(CountryDto dto)
         {
             var repository = _unitOfWork.GetRepository<CountryEntity, int>();
 
@@ -121,6 +122,9 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected override void DefineSortExpression(SortRule<CountryEntity, int> sortRule)
         {
+            if (sortRule == null)
+                throw new ArgumentNullException(nameof(sortRule));
+
             sortRule.Expression = country => country.Title;
         }
 

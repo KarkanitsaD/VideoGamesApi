@@ -44,7 +44,7 @@ namespace VideoGamesApi.Api.Home.Business
             return _mapper.Map<IList<CompanyEntity>, IList<CompanyDto>>(entities);
         }
 
-        public async Task<CompanyDto> Modify(CompanyDto dto)
+        public async Task<CompanyDto> UpdateAsync(CompanyDto dto)
         {
             var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
 
@@ -121,7 +121,7 @@ namespace VideoGamesApi.Api.Home.Business
             {
                 Expression = company =>
                     (companyModel.Id != null && company.Id == companyModel.Id || companyModel.Id == null)
-                    && (companyModel.Title != null && company.Title.Contains(companyModel.Title, StringComparison.Ordinal) || companyModel.Title == null)
+                    && (companyModel.Title != null && company.Title.Contains(companyModel.Title) || companyModel.Title == null)
             };
 
             return filterRule;
