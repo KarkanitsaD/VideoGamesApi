@@ -10,79 +10,15 @@ using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class VideoGameService : Service<VideoGameEntity, int>, IVideoGameService
+    public class VideoGameService : GenericService<VideoGameEntity, int, VideoGameDto, int, VideoGameQueryModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IBusinessMapper _mapper;
-
-        public VideoGameService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
+        public VideoGameService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
-        public async Task<VideoGameDto> GetAsync(VideoGameQueryModel queryModel)
+        public async override Task<VideoGameDto> RemoveAsync(int id)
         {
-            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entity = await repository.GetAsync(queryParameters);
-
-            return _mapper.Map<VideoGameEntity, VideoGameDto>(entity);
-        }
-
-        public async Task<IList<VideoGameDto>> GetListAsync(VideoGameQueryModel queryModel)
-        {
-            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entities = await repository.GetListAsync(queryParameters);
-
-            return _mapper.Map<IList<VideoGameEntity>, IList<VideoGameDto>>(entities);
-        }
-
-        public async Task<VideoGameDto> UpdateAsync(VideoGameDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
-
-            var entity = _mapper.Map<VideoGameDto, VideoGameEntity>(dto);
-
-            var entityToReturn = repository.Update(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<VideoGameEntity, VideoGameDto>(entityToReturn);
-        }
-
-        public async Task<VideoGameDto> CreateAsync(VideoGameDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
-
-            var entity = _mapper.Map<VideoGameDto, VideoGameEntity>(dto);
-
-            var entityToReturn = await repository.InsertAsync(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<VideoGameEntity, VideoGameDto>(entityToReturn);
-        }
-
-        public async Task CreateListAsync(IEnumerable<VideoGameDto> dtos)
-        {
-            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
-
-            var entities = _mapper.Map<IEnumerable<VideoGameDto>, IEnumerable<VideoGameEntity>>(dtos);
-
-            await repository.InsertAsync(entities);
-
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<VideoGameDto> RemoveAsync(int id)
-        {
-            var repository = _unitOfWork.GetRepository<VideoGameEntity, int>();
+            var repository = UnitOfWork.GetRepository<VideoGameEntity, int>();
 
             var queryParameters = new QueryParameters<VideoGameEntity, int>
             {
@@ -99,9 +35,9 @@ namespace VideoGamesApi.Api.Home.Business
 
             var deletedEntity = repository.Delete(entityToDelete);
 
-            await _unitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<VideoGameEntity, VideoGameDto>(deletedEntity);
+            return Mapper.Map<VideoGameEntity, VideoGameDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<VideoGameEntity, int> sortRule)
@@ -112,9 +48,9 @@ namespace VideoGamesApi.Api.Home.Business
             sortRule.Expression = game => game.Title;
         }
 
-        protected override FilterRule<VideoGameEntity, int> GetFilterRule(QueryModel model)
+        protected override FilterRule<VideoGameEntity, int> GetFilterRule(VideoGameQueryModel model)
         {
-            var gameModel = (VideoGameQueryModel)model;
+            var gameModel = model;
 
             var filterRule = new FilterRule<VideoGameEntity, int>
             {

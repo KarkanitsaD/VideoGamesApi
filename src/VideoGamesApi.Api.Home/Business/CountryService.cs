@@ -10,79 +10,15 @@ using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class CountryService : Service<CountryEntity, int>, ICountryService
+    public class CountryService : GenericService<CountryEntity, int, CountryDto, int, CountryQueryModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IBusinessMapper _mapper;
-
-        public CountryService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
+        public CountryService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
-        public async Task<CountryDto> GetAsync(CountryQueryModel queryModel)
+        public override async Task<CountryDto> RemoveAsync(int id)
         {
-            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entity = await repository.GetAsync(queryParameters);
-
-            return _mapper.Map<CountryEntity, CountryDto>(entity);
-        }
-
-        public async Task<IList<CountryDto>> GetListAsync(CountryQueryModel queryModel)
-        {
-            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entities = await repository.GetListAsync(queryParameters);
-
-            return _mapper.Map<IList<CountryEntity>, IList<CountryDto>>(entities);
-        }
-
-        public async Task<CountryDto> UpdateAsync(CountryDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
-
-            var entity = _mapper.Map<CountryDto, CountryEntity>(dto);
-
-            var entityToReturn = repository.Update(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CountryEntity, CountryDto>(entityToReturn);
-        }
-
-        public async Task<CountryDto> CreateAsync(CountryDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
-
-            var entity = _mapper.Map<CountryDto, CountryEntity>(dto);
-
-            var entityToReturn = await repository.InsertAsync(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CountryEntity, CountryDto>(entityToReturn);
-        }
-
-        public async Task CreateListAsync(IEnumerable<CountryDto> dtos)
-        {
-            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
-
-            var entities = _mapper.Map<IEnumerable<CountryDto>, IEnumerable<CountryEntity>>(dtos);
-
-            await repository.InsertAsync(entities);
-
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<CountryDto> RemoveAsync(int id)
-        {
-            var repository = _unitOfWork.GetRepository<CountryEntity, int>();
+            var repository = UnitOfWork.GetRepository<CountryEntity, int>();
 
             var queryParameters = new QueryParameters<CountryEntity, int>
             {
@@ -106,7 +42,7 @@ namespace VideoGamesApi.Api.Home.Business
             };
 
             var companiesToModify =
-                await _unitOfWork.GetRepository<CompanyEntity, int>().GetListAsync(companyQueryParameters);
+                await UnitOfWork.GetRepository<CompanyEntity, int>().GetListAsync(companyQueryParameters);
 
             foreach (var company in companiesToModify)
             {
@@ -115,9 +51,9 @@ namespace VideoGamesApi.Api.Home.Business
 
             var deletedEntity = repository.Delete(entityToDelete);
 
-            await _unitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<CountryEntity, CountryDto>(deletedEntity);
+            return Mapper.Map<CountryEntity, CountryDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<CountryEntity, int> sortRule)
@@ -128,9 +64,9 @@ namespace VideoGamesApi.Api.Home.Business
             sortRule.Expression = country => country.Title;
         }
 
-        protected override FilterRule<CountryEntity, int> GetFilterRule(QueryModel model)
+        protected override FilterRule<CountryEntity, int> GetFilterRule(CountryQueryModel model)
         {
-            var countryModel = (CountryQueryModel)model;
+            var countryModel = model;
 
             var filterRule = new FilterRule<CountryEntity, int>
             {

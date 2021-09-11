@@ -10,80 +10,15 @@ using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class CompanyService : Service<CompanyEntity, int>, ICompanyService
+    public class CompanyService : GenericService<CompanyEntity, int, CompanyDto, int, CompanyQueryModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IBusinessMapper _mapper;
-
-        public CompanyService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
+        public CompanyService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
-        public async Task<CompanyDto> GetAsync(CompanyQueryModel queryModel)
+        public override async Task<CompanyDto> RemoveAsync(int id)
         {
-            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entity = await repository.GetAsync(queryParameters);
-
-            return _mapper.Map<CompanyEntity, CompanyDto>(entity);
-
-        }
-
-        public async Task<IList<CompanyDto>> GetListAsync(CompanyQueryModel queryModel)
-        {
-            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entities = await repository.GetListAsync(queryParameters);
-
-            return _mapper.Map<IList<CompanyEntity>, IList<CompanyDto>>(entities);
-        }
-
-        public async Task<CompanyDto> UpdateAsync(CompanyDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
-
-            var entity = _mapper.Map<CompanyDto, CompanyEntity>(dto);
-
-            var entityToReturn = repository.Update(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CompanyEntity, CompanyDto>(entityToReturn);
-        }
-
-        public async Task<CompanyDto> CreateAsync(CompanyDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
-
-            var entity = _mapper.Map<CompanyDto, CompanyEntity>(dto);
-
-            var entityToReturn = await repository.InsertAsync(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CompanyEntity, CompanyDto>(entityToReturn);
-        }
-
-        public async Task CreateListAsync(IEnumerable<CompanyDto> dtos)
-        {
-            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
-
-            var entities = _mapper.Map<IEnumerable<CompanyDto>, IEnumerable<CompanyEntity>>(dtos);
-
-            await repository.InsertAsync(entities);
-
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<CompanyDto> RemoveAsync(int id)
-        {
-            var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
+            var repository = UnitOfWork.GetRepository<CompanyEntity, int>();
 
             var queryParameters = new QueryParameters<CompanyEntity, int>
             {
@@ -100,9 +35,9 @@ namespace VideoGamesApi.Api.Home.Business
 
             var deletedEntity = repository.Delete(entityToDelete);
 
-            await _unitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<CompanyEntity, CompanyDto>(deletedEntity);
+            return Mapper.Map<CompanyEntity, CompanyDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<CompanyEntity, int> sortRule)
@@ -113,9 +48,9 @@ namespace VideoGamesApi.Api.Home.Business
             sortRule.Expression = company => company.Title;
         }
 
-        protected override FilterRule<CompanyEntity, int> GetFilterRule(QueryModel model)
+        protected override FilterRule<CompanyEntity, int> GetFilterRule(CompanyQueryModel model)
         {
-            var companyModel = (CompanyQueryModel)model;
+            var companyModel = model;
 
             var filterRule = new FilterRule<CompanyEntity, int>
             {

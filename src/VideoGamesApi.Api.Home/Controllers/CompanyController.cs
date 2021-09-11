@@ -64,6 +64,8 @@ namespace VideoGamesApi.Api.Home.Controllers
         [HttpPut("{id}")]
         public async Task<CompanyModel> Put(int id, [FromBody] CompanyModel model)
         {
+            model.Id = id;
+
             var dto = _mapper.Map<CompanyModel, CompanyDto>(model);
 
             var dtoToReturn = await _service.UpdateAsync(dto);

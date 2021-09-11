@@ -10,79 +10,15 @@ using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class GenreService : Service<GenreEntity, int>, IGenreService
+    public class GenreService : GenericService<GenreEntity, int, GenreDto, int, GenreQueryModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IBusinessMapper _mapper;
-
-        public GenreService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
+        public GenreService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
-        public async Task<GenreDto> GetAsync(GenreQueryModel queryModel)
+        public async override Task<GenreDto> RemoveAsync(int id)
         {
-            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entity = await repository.GetAsync(queryParameters);
-
-            return _mapper.Map<GenreEntity, GenreDto>(entity);
-        }
-
-        public async Task<IList<GenreDto>> GetListAsync(GenreQueryModel queryModel)
-        {
-            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
-
-            var queryParameters = GetQueryParameters(queryModel);
-
-            var entities = await repository.GetListAsync(queryParameters);
-
-            return _mapper.Map<IList<GenreEntity>, IList<GenreDto>>(entities);
-        }
-
-        public async Task<GenreDto> UpdateAsync(GenreDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
-
-            var entity = _mapper.Map<GenreDto, GenreEntity>(dto);
-
-            var entityToReturn = repository.Update(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<GenreEntity, GenreDto>(entityToReturn);
-        }
-
-        public async Task<GenreDto> CreateAsync(GenreDto dto)
-        {
-            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
-
-            var entity = _mapper.Map<GenreDto, GenreEntity>(dto);
-
-            var entityToReturn = await repository.InsertAsync(entity);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<GenreEntity, GenreDto>(entityToReturn);
-        }
-
-        public async Task CreateListAsync(IEnumerable<GenreDto> dtos)
-        {
-            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
-
-            var entities = _mapper.Map<IEnumerable<GenreDto>, IEnumerable<GenreEntity>>(dtos);
-
-            await repository.InsertAsync(entities);
-
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<GenreDto> RemoveAsync(int id)
-        {
-            var repository = _unitOfWork.GetRepository<GenreEntity, int>();
+            var repository = UnitOfWork.GetRepository<GenreEntity, int>();
 
             var queryParameters = new QueryParameters<GenreEntity, int>
             {
@@ -99,9 +35,9 @@ namespace VideoGamesApi.Api.Home.Business
 
             var deletedEntity = repository.Delete(entityToDelete);
 
-            await _unitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<GenreEntity, GenreDto>(deletedEntity);
+            return Mapper.Map<GenreEntity, GenreDto>(deletedEntity);
         }
 
         protected override void DefineSortExpression(SortRule<GenreEntity, int> sortRule)
@@ -112,9 +48,9 @@ namespace VideoGamesApi.Api.Home.Business
             sortRule.Expression = genre => genre.Title;
         }
 
-        protected override FilterRule<GenreEntity, int> GetFilterRule(QueryModel model)
+        protected override FilterRule<GenreEntity, int> GetFilterRule(GenreQueryModel model)
         {
-            var genreModel = (GenreQueryModel)model;
+            var genreModel = model;
 
             var filterExpression = new FilterRule<GenreEntity, int>
             {
@@ -127,3 +63,4 @@ namespace VideoGamesApi.Api.Home.Business
         }
     }
 }
+
