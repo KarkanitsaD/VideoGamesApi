@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using VideoGamesApi.Api.Home.Data.Models;
-// clear code
 namespace VideoGamesApi.Api.Home.Data
 {
     public class Context : DbContext

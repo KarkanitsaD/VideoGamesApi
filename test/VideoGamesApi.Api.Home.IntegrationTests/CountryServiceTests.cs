@@ -179,7 +179,7 @@ namespace VideoGamesApi.Api.Home.IntegrationTests
             {
                 _service = new CountryService(new UnitOfWork(db), _mapper);
 
-                await _service.Modify(entityToUpdate);
+                await _service.UpdateAsync(entityToUpdate);
 
                 var queryModel = new CountryQueryModel()
                 {

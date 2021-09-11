@@ -43,7 +43,7 @@ namespace VideoGamesApi.Api.Home.Business
             return _mapper.Map<IList<GenreEntity>, IList<GenreDto>>(entities);
         }
 
-        public async Task<GenreDto> Modify(GenreDto dto)
+        public async Task<GenreDto> UpdateAsync(GenreDto dto)
         {
             var repository = _unitOfWork.GetRepository<GenreEntity, int>();
 

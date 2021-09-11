@@ -5,18 +5,8 @@ using VideoGamesApi.Api.Home.Business.QueryModels;
 
 namespace VideoGamesApi.Api.Home.Business.Contracts
 {
-    public interface IVideoGameService
+    public interface IVideoGameService : IService<VideoGameDto, int, VideoGameQueryModel>
     {
-        Task<VideoGameDto> GetAsync(VideoGameQueryModel queryModel);
-
-        Task<IList<VideoGameDto>> GetListAsync(VideoGameQueryModel queryModel);
-
-        Task<VideoGameDto> Modify(VideoGameDto dto);
-
-        Task<VideoGameDto> CreateAsync(VideoGameDto dto);
-
-        Task CreateListAsync(IEnumerable<VideoGameDto> dtos);
-
-        Task<VideoGameDto> RemoveAsync(int id);
+        
     }
 }

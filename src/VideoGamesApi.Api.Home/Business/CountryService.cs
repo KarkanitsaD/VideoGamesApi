@@ -43,7 +43,7 @@ namespace VideoGamesApi.Api.Home.Business
             return _mapper.Map<IList<CountryEntity>, IList<CountryDto>>(entities);
         }
 
-        public async Task<CountryDto> Modify(CountryDto dto)
+        public async Task<CountryDto> UpdateAsync(CountryDto dto)
         {
             var repository = _unitOfWork.GetRepository<CountryEntity, int>();
 

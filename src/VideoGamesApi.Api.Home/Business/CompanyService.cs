@@ -44,7 +44,7 @@ namespace VideoGamesApi.Api.Home.Business
             return _mapper.Map<IList<CompanyEntity>, IList<CompanyDto>>(entities);
         }
 
-        public async Task<CompanyDto> Modify(CompanyDto dto)
+        public async Task<CompanyDto> UpdateAsync(CompanyDto dto)
         {
             var repository = _unitOfWork.GetRepository<CompanyEntity, int>();
 

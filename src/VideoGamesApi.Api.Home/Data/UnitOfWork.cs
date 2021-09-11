@@ -8,10 +8,10 @@ namespace VideoGamesApi.Api.Home.Data
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DbContext _context;
+        private readonly Context _context;
         private bool _disposed;
         private readonly Dictionary<string, object> _repositories;
-        public UnitOfWork(DbContext context)
+        public UnitOfWork(Context context)
         {
             _context = context;
             _repositories = new Dictionary<string, object>();

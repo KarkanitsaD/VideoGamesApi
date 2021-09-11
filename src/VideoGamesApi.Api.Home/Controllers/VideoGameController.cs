@@ -66,7 +66,7 @@ namespace VideoGamesApi.Api.Home.Controllers
         {
             var dto = _mapper.Map<VideoGameModel, VideoGameDto>(model);
 
-            var dtoToReturn = await _service.Modify(dto);
+            var dtoToReturn = await _service.UpdateAsync(dto);
 
             return _mapper.Map<VideoGameDto, VideoGameModel>(dtoToReturn);
         }

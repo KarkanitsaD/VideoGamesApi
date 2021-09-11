@@ -209,7 +209,7 @@ namespace VideoGamesApi.Api.Home.IntegrationTests
             {
                 _service = new VideoGameService(new UnitOfWork(db), _mapper);
 
-                await _service.Modify(entityToUpdate);
+                await _service.UpdateAsync(entityToUpdate);
 
                 var queryModel = new VideoGameQueryModel()
                 {
