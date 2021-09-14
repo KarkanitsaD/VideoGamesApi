@@ -9,21 +9,21 @@ using SortOrder = VideoGamesApi.Api.Home.Business.QueryModels.SortOrder;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public abstract class GenericService<TEntity, TEntityKey, TDto, TDtoKey, TQueryModel>
+    public abstract class BaseService<TEntity, TEntityKey, TDto, TDtoKey, TQueryModel> : IBaseService<TEntity, TEntityKey, TDto, TDtoKey, TQueryModel>
         where TEntity : class, IEntity<TEntityKey>
         where TDto : class, IDto<TDtoKey>
         where TQueryModel : QueryModel
     {
-        protected readonly IUnitOfWork UnitOfWork;
-        protected readonly IBusinessMapper Mapper;
+        protected IUnitOfWork UnitOfWork;
+        protected IBusinessMapper Mapper;
 
-        protected GenericService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
+        protected BaseService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
         {
             UnitOfWork = unitOfWork;
             Mapper = mapper;
         }
 
-        public async Task<TDto> GetAsync(TQueryModel queryModel)
+        public virtual async Task<TDto> GetAsync(TQueryModel queryModel)
         {
             var repository = UnitOfWork.GetRepository<TEntity, TEntityKey>();
 
@@ -35,7 +35,7 @@ namespace VideoGamesApi.Api.Home.Business
 
         }
 
-        public async Task<IList<TDto>> GetListAsync(TQueryModel queryModel)
+        public virtual async Task<IList<TDto>> GetListAsync(TQueryModel queryModel)
         {
             var repository = UnitOfWork.GetRepository<TEntity, TEntityKey>();
 
@@ -46,7 +46,7 @@ namespace VideoGamesApi.Api.Home.Business
             return Mapper.Map<IList<TEntity>, IList<TDto>>(entities);
         }
 
-        public async Task<TDto> UpdateAsync(TDto dto)
+        public virtual async Task<TDto> UpdateAsync(TDto dto)
         {
             var repository = UnitOfWork.GetRepository<TEntity, TEntityKey>();
 
@@ -59,7 +59,7 @@ namespace VideoGamesApi.Api.Home.Business
             return Mapper.Map<TEntity, TDto>(entityToReturn);
         }
 
-        public async Task<TDto> CreateAsync(TDto dto)
+        public virtual async Task<TDto> CreateAsync(TDto dto)
         {
             var repository = UnitOfWork.GetRepository<TEntity, TEntityKey>();
 
@@ -72,7 +72,7 @@ namespace VideoGamesApi.Api.Home.Business
             return Mapper.Map<TEntity, TDto>(entityToReturn);
         }
 
-        public async Task CreateListAsync(IEnumerable<TDto> dtos)
+        public virtual async Task CreateListAsync(IEnumerable<TDto> dtos)
         {
             var repository = UnitOfWork.GetRepository<TEntity, TEntityKey>();
 
@@ -85,7 +85,7 @@ namespace VideoGamesApi.Api.Home.Business
 
         public abstract Task<TDto> RemoveAsync(int id);
 
-        private SortRule<TEntity, TEntityKey> GetSortRule(TQueryModel model)
+        protected virtual SortRule<TEntity, TEntityKey> GetSortRule(TQueryModel model)
         {
             var sortRule = new SortRule<TEntity, TEntityKey>();
 
@@ -102,7 +102,7 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected abstract void DefineSortExpression(SortRule<TEntity, TEntityKey> sortRule);
 
-        private static PageRule GetPageRule(TQueryModel model)
+        protected virtual  PageRule GetPageRule(TQueryModel model)
         {
             var pageRule = new PageRule();
 
@@ -117,7 +117,7 @@ namespace VideoGamesApi.Api.Home.Business
 
         protected abstract FilterRule<TEntity, TEntityKey> GetFilterRule(TQueryModel model);
 
-        protected QueryParameters<TEntity, TEntityKey> GetQueryParameters(TQueryModel model)
+        protected virtual QueryParameters<TEntity, TEntityKey> GetQueryParameters(TQueryModel model)
         {
             if (model == null)
                 throw new ArgumentNullException($"{nameof(model)}");

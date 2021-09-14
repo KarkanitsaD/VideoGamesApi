@@ -10,7 +10,7 @@ using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class CountryService : GenericService<CountryEntity, int, CountryDto, int, CountryQueryModel>
+    public class CountryService : BaseService<CountryEntity, int, CountryDto, int, CountryQueryModel>, ICountryService
     {
         public CountryService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
         {

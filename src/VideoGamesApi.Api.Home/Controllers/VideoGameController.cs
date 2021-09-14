@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using VideoGamesApi.Api.Home.Business;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
@@ -14,10 +13,10 @@ namespace VideoGamesApi.Api.Home.Controllers
     [ApiController]
     public class VideoGameController : ControllerBase
     {
-        private readonly VideoGameService _service;
+        private readonly IVideoGameService _service;
         private readonly IMapper _mapper;
 
-        public VideoGameController(VideoGameService service, IMapper mapper)
+        public VideoGameController(IVideoGameService service, IMapper mapper)
         {
             _service = service;
             _mapper = mapper;

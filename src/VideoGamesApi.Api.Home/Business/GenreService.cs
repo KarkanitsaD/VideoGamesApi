@@ -10,13 +10,13 @@ using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class GenreService : GenericService<GenreEntity, int, GenreDto, int, GenreQueryModel>
+    public class GenreService : BaseService<GenreEntity, int, GenreDto, int, GenreQueryModel>, IGenreService
     {
         public GenreService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
-        public async override Task<GenreDto> RemoveAsync(int id)
+        public override async Task<GenreDto> RemoveAsync(int id)
         {
             var repository = UnitOfWork.GetRepository<GenreEntity, int>();
 

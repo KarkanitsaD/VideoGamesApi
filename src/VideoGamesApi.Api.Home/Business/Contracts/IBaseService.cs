@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data.Contracts;
+
 
 namespace VideoGamesApi.Api.Home.Business.Contracts
 {
-    public interface IService<TDto, TKey, in TQueryModel>
-        where TDto : class, IDto<TKey>
+    public interface IBaseService<TEntity, TEntityKey, TDto, TDtoKey, in TQueryModel>
+        where TEntity : class, IEntity<TEntityKey>
+        where TDto : class, IDto<TDtoKey>
         where TQueryModel : QueryModel
     {
         Task<TDto> GetAsync(TQueryModel queryModel);

@@ -8,10 +8,10 @@ namespace VideoGamesApi.Api.Home.Business.Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddTransient<VideoGameService>();
-            services.AddTransient<GenreService>();
-            services.AddTransient<CompanyService>();
-            services.AddTransient<CountryService>();
+            services.AddTransient<IVideoGameService, VideoGameService>();
+            services.AddTransient<IGenreService, GenreService>();
+            services.AddTransient<ICompanyService, CompanyService>();
+            services.AddTransient<ICountryService, CountryService>();
 
             return services;
         }
