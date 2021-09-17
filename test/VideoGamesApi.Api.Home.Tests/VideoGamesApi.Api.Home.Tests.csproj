@@ -25,4 +25,8 @@
     <ProjectReference Include="..\..\src\VideoGamesApi.Api.Home\VideoGamesApi.Api.Home.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Business\Services\" />
+  </ItemGroup>
+
 </Project>
