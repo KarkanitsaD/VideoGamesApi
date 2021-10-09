@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
@@ -12,7 +13,7 @@ namespace VideoGamesApi.Api.Home.Business
 {
     public class GenreService : BaseService<GenreEntity, int, GenreDto, int, GenreQueryModel>, IGenreService
     {
-        public GenreService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
+        public GenreService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 

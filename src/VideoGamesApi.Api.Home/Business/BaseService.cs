@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.QueryModels;
 using VideoGamesApi.Api.Home.Data.Contracts;
@@ -15,9 +16,9 @@ namespace VideoGamesApi.Api.Home.Business
         where TQueryModel : QueryModel
     {
         protected IUnitOfWork UnitOfWork;
-        protected IBusinessMapper Mapper;
+        protected IMapper Mapper;
 
-        protected BaseService(IUnitOfWork unitOfWork, IBusinessMapper mapper)
+        protected BaseService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             UnitOfWork = unitOfWork;
             Mapper = mapper;

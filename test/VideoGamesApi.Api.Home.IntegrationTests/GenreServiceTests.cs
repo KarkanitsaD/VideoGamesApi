@@ -16,15 +16,15 @@ namespace VideoGamesApi.Api.Home.IntegrationTests
 {
     public class GenreServiceTests
     {
-        private readonly IBusinessMapper _mapper;
+        private readonly IMapper _mapper;
         private IGenreService _service;
 
         public GenreServiceTests()
         {
-            _mapper = new BusinessMapper(new Mapper(new MapperConfiguration(mc =>
+            _mapper = new Mapper(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new BusinessMappingProfile());
-            })));
+            }));
         }
 
         [Theory]

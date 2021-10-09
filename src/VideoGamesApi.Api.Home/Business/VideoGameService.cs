@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
@@ -12,7 +13,7 @@ namespace VideoGamesApi.Api.Home.Business
 {
     public class VideoGameService : BaseService<VideoGameEntity, int, VideoGameDto, int, VideoGameQueryModel>, IVideoGameService
     {
-        public VideoGameService(IUnitOfWork unitOfWork, IBusinessMapper mapper) : base(unitOfWork, mapper)
+        public VideoGameService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 

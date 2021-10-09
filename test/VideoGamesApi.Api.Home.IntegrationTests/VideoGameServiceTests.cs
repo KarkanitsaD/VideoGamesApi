@@ -16,15 +16,15 @@ namespace VideoGamesApi.Api.Home.IntegrationTests
 {
     public class VideoGameServiceTests
     {
-        private readonly IBusinessMapper _mapper;
+        private readonly IMapper _mapper;
         private IVideoGameService _service;
 
         public VideoGameServiceTests()
         {
-            _mapper = new BusinessMapper(new Mapper(new MapperConfiguration(mc =>
+            _mapper = new Mapper(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new BusinessMappingProfile());
-            })));
+            }));
         }
 
         [Theory]
