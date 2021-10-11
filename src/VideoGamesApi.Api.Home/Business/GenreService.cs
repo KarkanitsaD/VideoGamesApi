@@ -5,22 +5,78 @@ using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
 using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class GenreService : BaseService<GenreEntity, int, GenreDto, int, GenreQueryModel>, IGenreService
+    public class GenreService : IGenreService
     {
-        public GenreService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IMapper _mapper;
+        private readonly Context _context;
+        private readonly IGenreRepository _genreRepository;
+
+
+        public GenreService(IMapper mapper, Context context, IGenreRepository genreRepository)
         {
+            _mapper = mapper;
+            _context = context;
+            _genreRepository = genreRepository;
         }
 
-        public override async Task<GenreDto> RemoveAsync(int id)
+        public async Task<GenreDto> GetAsync(GenreQueryModel queryModel)
         {
-            var repository = UnitOfWork.GetRepository<GenreEntity, int>();
+            var queryParameters = GetQueryParameters(queryModel);
 
+            var entity = await _genreRepository.GetAsync(queryParameters);
+
+            return _mapper.Map<GenreEntity, GenreDto>(entity);
+        }
+
+        public async Task<IList<GenreDto>> GetListAsync(GenreQueryModel queryModel)
+        {
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entities = await _genreRepository.GetListAsync(queryParameters);
+
+            return _mapper.Map<IList<GenreEntity>, IList<GenreDto>>(entities);
+        }
+
+        public async Task<GenreDto> UpdateAsync(GenreDto dto)
+        {
+            var entity = _mapper.Map<GenreDto, GenreEntity>(dto);
+
+            var entityToReturn = _genreRepository.Update(entity);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<GenreEntity, GenreDto>(entityToReturn);
+        }
+
+        public async Task<GenreDto> CreateAsync(GenreDto dto)
+        {
+            var entity = _mapper.Map<GenreDto, GenreEntity>(dto);
+
+            var entityToReturn = await _genreRepository.InsertAsync(entity);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<GenreEntity, GenreDto>(entityToReturn);
+        }
+
+        public async Task CreateListAsync(IEnumerable<GenreDto> dtos)
+        {
+            var entities = _mapper.Map<IEnumerable<GenreDto>, IEnumerable<GenreEntity>>(dtos);
+
+            await _genreRepository.InsertAsync(entities);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<GenreDto> RemoveAsync(int id)
+        {
             var queryParameters = new QueryParameters<GenreEntity, int>
             {
                 FilterRule = new FilterRule<GenreEntity, int>
@@ -29,27 +85,34 @@ namespace VideoGamesApi.Api.Home.Business
                 }
             };
 
-            var entityToDelete = await repository.GetAsync(queryParameters);
+            var entityToDelete = await _genreRepository.GetAsync(queryParameters);
 
             if (entityToDelete == null)
                 throw new KeyNotFoundException();
 
-            var deletedEntity = repository.Delete(entityToDelete);
+            var deletedEntity = _genreRepository.Delete(entityToDelete);
 
-            await UnitOfWork.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return Mapper.Map<GenreEntity, GenreDto>(deletedEntity);
+            return _mapper.Map<GenreEntity, GenreDto>(deletedEntity);
         }
 
-        protected override void DefineSortExpression(SortRule<GenreEntity, int> sortRule)
+        private static QueryParameters<GenreEntity, int> GetQueryParameters(GenreQueryModel model)
         {
-            if (sortRule == null)
-                throw new ArgumentNullException(nameof(sortRule));
+            if (model == null)
+                throw new ArgumentNullException($"{nameof(model)}");
 
-            sortRule.Expression = genre => genre.Title;
+            var queryParameters = new QueryParameters<GenreEntity, int>
+            {
+                FilterRule = GetFilterRule(model),
+                SortRule = GetSortRule(model),
+                PageRule = GetPageRule(model)
+            };
+
+            return queryParameters;
         }
 
-        protected override FilterRule<GenreEntity, int> GetFilterRule(GenreQueryModel model)
+        private static FilterRule<GenreEntity, int> GetFilterRule(GenreQueryModel model)
         {
             var genreModel = model;
 
@@ -61,6 +124,42 @@ namespace VideoGamesApi.Api.Home.Business
             };
 
             return filterExpression;
+        }
+
+        private static SortRule<GenreEntity, int> GetSortRule(GenreQueryModel model)
+        {
+            var sortRule = new SortRule<GenreEntity, int>();
+
+            if (!model.IsValidSortModel)
+                return sortRule;
+
+            sortRule.Order = model.SortOrder == QueryModels.SortOrder.Ascending
+                ? Data.Query.SortOrder.Ascending
+                : Data.Query.SortOrder.Descending;
+            DefineSortExpression(sortRule);
+
+            return sortRule;
+        }
+
+        private static PageRule GetPageRule(GenreQueryModel model)
+        {
+            var pageRule = new PageRule();
+
+            if (!model.IsValidPageModel)
+                return pageRule;
+
+            pageRule.Index = model.Index;
+            pageRule.Size = model.Size;
+
+            return pageRule;
+        }
+
+        private static void DefineSortExpression(SortRule<GenreEntity, int> sortRule)
+        {
+            if (sortRule == null)
+                throw new ArgumentNullException(nameof(sortRule));
+
+            sortRule.Expression = genre => genre.Title;
         }
     }
 }

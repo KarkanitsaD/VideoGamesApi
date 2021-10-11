@@ -5,22 +5,78 @@ using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
 using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class CompanyService : BaseService<CompanyEntity, int, CompanyDto, int, CompanyQueryModel>, ICompanyService
+    public class CompanyService : ICompanyService
     {
-        public CompanyService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IMapper _mapper;
+        private readonly Context _context;
+        private readonly ICompanyRepository _companyRepository;
+
+
+        public CompanyService(IMapper mapper, Context context, ICompanyRepository companyRepository)
         {
+            _mapper = mapper;
+            _context = context;
+            _companyRepository = companyRepository;
         }
 
-        public override async Task<CompanyDto> RemoveAsync(int id)
+        public async Task<CompanyDto> GetAsync(CompanyQueryModel queryModel)
         {
-            var repository = UnitOfWork.GetRepository<CompanyEntity, int>();
+            var queryParameters = GetQueryParameters(queryModel);
 
+            var entity = await _companyRepository.GetAsync(queryParameters);
+
+            return _mapper.Map<CompanyEntity, CompanyDto>(entity);
+        }
+
+        public async Task<IList<CompanyDto>> GetListAsync(CompanyQueryModel queryModel)
+        {
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entities = await _companyRepository.GetListAsync(queryParameters);
+
+            return _mapper.Map<IList<CompanyEntity>, IList<CompanyDto>>(entities);
+        }
+
+        public async Task<CompanyDto> UpdateAsync(CompanyDto dto)
+        {
+            var entity = _mapper.Map<CompanyDto, CompanyEntity>(dto);
+
+            var entityToReturn = _companyRepository.Update(entity);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<CompanyEntity, CompanyDto>(entityToReturn);
+        }
+
+        public async Task<CompanyDto> CreateAsync(CompanyDto dto)
+        {
+            var entity = _mapper.Map<CompanyDto, CompanyEntity>(dto);
+
+            var entityToReturn = await _companyRepository.InsertAsync(entity);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<CompanyEntity, CompanyDto>(entityToReturn);
+        }
+
+        public async Task CreateListAsync(IEnumerable<CompanyDto> dtos)
+        {
+            var entities = _mapper.Map<IEnumerable<CompanyDto>, IEnumerable<CompanyEntity>>(dtos);
+
+            await _companyRepository.InsertAsync(entities);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<CompanyDto> RemoveAsync(int id)
+        {
             var queryParameters = new QueryParameters<CompanyEntity, int>
             {
                 FilterRule = new FilterRule<CompanyEntity, int>
@@ -29,27 +85,34 @@ namespace VideoGamesApi.Api.Home.Business
                 }
             };
 
-            var entityToDelete = await repository.GetAsync(queryParameters);
+            var entityToDelete = await _companyRepository.GetAsync(queryParameters);
 
             if (entityToDelete == null)
                 throw new KeyNotFoundException();
 
-            var deletedEntity = repository.Delete(entityToDelete);
+            var deletedEntity = _companyRepository.Delete(entityToDelete);
 
-            await UnitOfWork.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return Mapper.Map<CompanyEntity, CompanyDto>(deletedEntity);
+            return _mapper.Map<CompanyEntity, CompanyDto>(deletedEntity);
         }
 
-        protected override void DefineSortExpression(SortRule<CompanyEntity, int> sortRule)
+        private static QueryParameters<CompanyEntity, int> GetQueryParameters(CompanyQueryModel model)
         {
-            if (sortRule == null)
-                throw new ArgumentNullException(nameof(sortRule));
+            if (model == null)
+                throw new ArgumentNullException($"{nameof(model)}");
 
-            sortRule.Expression = company => company.Title;
+            var queryParameters = new QueryParameters<CompanyEntity, int>
+            {
+                FilterRule = GetFilterRule(model),
+                SortRule = GetSortRule(model),
+                PageRule = GetPageRule(model)
+            };
+
+            return queryParameters;
         }
 
-        protected override FilterRule<CompanyEntity, int> GetFilterRule(CompanyQueryModel model)
+        private static FilterRule<CompanyEntity, int> GetFilterRule(CompanyQueryModel model)
         {
             var companyModel = model;
 
@@ -61,6 +124,42 @@ namespace VideoGamesApi.Api.Home.Business
             };
 
             return filterRule;
+        }
+
+        private static SortRule<CompanyEntity, int> GetSortRule(CompanyQueryModel model)
+        {
+            var sortRule = new SortRule<CompanyEntity, int>();
+
+            if (!model.IsValidSortModel)
+                return sortRule;
+
+            sortRule.Order = model.SortOrder == QueryModels.SortOrder.Ascending
+                ? Data.Query.SortOrder.Ascending
+                : Data.Query.SortOrder.Descending;
+            DefineSortExpression(sortRule);
+
+            return sortRule;
+        }
+
+        private static PageRule GetPageRule(CompanyQueryModel model)
+        {
+            var pageRule = new PageRule();
+
+            if (!model.IsValidPageModel)
+                return pageRule;
+
+            pageRule.Index = model.Index;
+            pageRule.Size = model.Size;
+
+            return pageRule;
+        }
+
+        private static void DefineSortExpression(SortRule<CompanyEntity, int> sortRule)
+        {
+            if (sortRule == null)
+                throw new ArgumentNullException(nameof(sortRule));
+
+            sortRule.Expression = company => company.Title;
         }
     }
 }

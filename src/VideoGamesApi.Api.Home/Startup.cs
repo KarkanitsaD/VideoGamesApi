@@ -28,6 +28,7 @@ namespace VideoGamesApi.Api.Home
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString")));
 
+            services.AddRepositories();
             services.AddUnitOfWork();
             services.AddServices();
 

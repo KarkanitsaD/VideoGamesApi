@@ -1,11 +1,22 @@
-﻿using VideoGamesApi.Api.Home.Business.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
-using VideoGamesApi.Api.Home.Data.Models;
 
 namespace VideoGamesApi.Api.Home.Business.Contracts
 {
-    public interface ICountryService : IBaseService<CountryEntity, int, CountryDto, int, CountryQueryModel>
+    public interface ICountryService
     {
+        Task<CountryDto> GetAsync(CountryQueryModel queryModel);
 
+        Task<IList<CountryDto>> GetListAsync(CountryQueryModel queryModel);
+
+        Task<CountryDto> UpdateAsync(CountryDto dto);
+
+        Task<CountryDto> CreateAsync(CountryDto dto);
+
+        Task CreateListAsync(IEnumerable<CountryDto> dtos);
+
+        Task<CountryDto> RemoveAsync(int id);
     }
 }

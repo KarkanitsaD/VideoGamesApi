@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VideoGamesApi.Api.Home.Data.Contracts;
+using VideoGamesApi.Api.Home.Data.Repositories;
 
 namespace VideoGamesApi.Api.Home.Data
 {

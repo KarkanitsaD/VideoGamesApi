@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VideoGamesApi.Api.Home.Data;
 using VideoGamesApi.Api.Home.Data.Contracts;
+using VideoGamesApi.Api.Home.Data.Repositories;
 using VideoGamesApi.Api.Home.IntegrationTests.Fakes;
 using VideoGamesApi.Api.Home.Tests.Data.Fakes;
 using Xunit;

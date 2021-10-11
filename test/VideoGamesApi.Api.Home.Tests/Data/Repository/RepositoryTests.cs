@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VideoGamesApi.Api.Home.Data;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Query;
+using VideoGamesApi.Api.Home.Data.Repositories;
 using VideoGamesApi.Api.Home.Tests.Data.Fakes;
 using Xunit;
 

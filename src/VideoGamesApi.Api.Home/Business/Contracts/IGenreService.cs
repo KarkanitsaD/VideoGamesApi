@@ -1,11 +1,22 @@
-﻿using VideoGamesApi.Api.Home.Business.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
-using VideoGamesApi.Api.Home.Data.Models;
 
 namespace VideoGamesApi.Api.Home.Business.Contracts
 {
-    public interface IGenreService : IBaseService<GenreEntity, int, GenreDto, int, GenreQueryModel>
+    public interface IGenreService
     {
-        
+        Task<GenreDto> GetAsync(GenreQueryModel queryModel);
+
+        Task<IList<GenreDto>> GetListAsync(GenreQueryModel queryModel);
+
+        Task<GenreDto> UpdateAsync(GenreDto dto);
+
+        Task<GenreDto> CreateAsync(GenreDto dto);
+
+        Task CreateListAsync(IEnumerable<GenreDto> dtos);
+
+        Task<GenreDto> RemoveAsync(int id);
     }
 }

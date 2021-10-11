@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Query;
 
-namespace VideoGamesApi.Api.Home.Data
+namespace VideoGamesApi.Api.Home.Data.Repositories
 {
     public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     {

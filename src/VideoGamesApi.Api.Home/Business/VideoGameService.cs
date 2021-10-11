@@ -5,22 +5,78 @@ using AutoMapper;
 using VideoGamesApi.Api.Home.Business.Contracts;
 using VideoGamesApi.Api.Home.Business.Models;
 using VideoGamesApi.Api.Home.Business.QueryModels;
+using VideoGamesApi.Api.Home.Data;
 using VideoGamesApi.Api.Home.Data.Contracts;
 using VideoGamesApi.Api.Home.Data.Models;
 using VideoGamesApi.Api.Home.Data.Query;
 
 namespace VideoGamesApi.Api.Home.Business
 {
-    public class VideoGameService : BaseService<VideoGameEntity, int, VideoGameDto, int, VideoGameQueryModel>, IVideoGameService
+    public class VideoGameService : IVideoGameService
     {
-        public VideoGameService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IMapper _mapper;
+        private readonly Context _context;
+        private readonly IVideoGameRepository _videoGameRepository;
+
+
+        public VideoGameService(IMapper mapper, Context context, IVideoGameRepository videoGameRepository)
         {
+            _mapper = mapper;
+            _context = context;
+            _videoGameRepository = videoGameRepository;
         }
 
-        public override async Task<VideoGameDto> RemoveAsync(int id)
+        public async Task<VideoGameDto> GetAsync(VideoGameQueryModel queryModel)
         {
-            var repository = UnitOfWork.GetRepository<VideoGameEntity, int>();
+            var queryParameters = GetQueryParameters(queryModel);
 
+            var entity = await _videoGameRepository.GetAsync(queryParameters);
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(entity);
+        }
+
+        public async Task<IList<VideoGameDto>> GetListAsync(VideoGameQueryModel queryModel)
+        {
+            var queryParameters = GetQueryParameters(queryModel);
+
+            var entities = await _videoGameRepository.GetListAsync(queryParameters);
+
+            return _mapper.Map<IList<VideoGameEntity>, IList<VideoGameDto>>(entities);
+        }
+
+        public async Task<VideoGameDto> UpdateAsync(VideoGameDto dto)
+        {
+            var entity = _mapper.Map<VideoGameDto, VideoGameEntity>(dto);
+
+            var entityToReturn = _videoGameRepository.Update(entity);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(entityToReturn);
+        }
+
+        public async Task<VideoGameDto> CreateAsync(VideoGameDto dto)
+        {
+            var entity = _mapper.Map<VideoGameDto, VideoGameEntity>(dto);
+
+            var entityToReturn = await _videoGameRepository.InsertAsync(entity);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(entityToReturn);
+        }
+
+        public async Task CreateListAsync(IEnumerable<VideoGameDto> dtos)
+        {
+            var entities = _mapper.Map<IEnumerable<VideoGameDto>, IEnumerable<VideoGameEntity>>(dtos);
+
+            await _videoGameRepository.InsertAsync(entities);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<VideoGameDto> RemoveAsync(int id)
+        {
             var queryParameters = new QueryParameters<VideoGameEntity, int>
             {
                 FilterRule = new FilterRule<VideoGameEntity, int>
@@ -29,27 +85,34 @@ namespace VideoGamesApi.Api.Home.Business
                 }
             };
 
-            var entityToDelete = await repository.GetAsync(queryParameters);
+            var entityToDelete = await _videoGameRepository.GetAsync(queryParameters);
 
             if (entityToDelete == null)
                 throw new KeyNotFoundException();
 
-            var deletedEntity = repository.Delete(entityToDelete);
+            var deletedEntity = _videoGameRepository.Delete(entityToDelete);
 
-            await UnitOfWork.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return Mapper.Map<VideoGameEntity, VideoGameDto>(deletedEntity);
+            return _mapper.Map<VideoGameEntity, VideoGameDto>(deletedEntity);
         }
 
-        protected override void DefineSortExpression(SortRule<VideoGameEntity, int> sortRule)
+        private static QueryParameters<VideoGameEntity, int> GetQueryParameters(VideoGameQueryModel model)
         {
-            if (sortRule == null)
-                throw new ArgumentNullException(nameof(sortRule));
+            if (model == null)
+                throw new ArgumentNullException($"{nameof(model)}");
 
-            sortRule.Expression = game => game.Title;
+            var queryParameters = new QueryParameters<VideoGameEntity, int>
+            {
+                FilterRule = GetFilterRule(model),
+                SortRule = GetSortRule(model),
+                PageRule = GetPageRule(model)
+            };
+
+            return queryParameters;
         }
 
-        protected override FilterRule<VideoGameEntity, int> GetFilterRule(VideoGameQueryModel model)
+        private static FilterRule<VideoGameEntity, int> GetFilterRule(VideoGameQueryModel model)
         {
             var gameModel = model;
 
@@ -62,6 +125,42 @@ namespace VideoGamesApi.Api.Home.Business
             };
 
             return filterRule;
+        }
+
+        private static SortRule<VideoGameEntity, int> GetSortRule(VideoGameQueryModel model)
+        {
+            var sortRule = new SortRule<VideoGameEntity, int>();
+
+            if (!model.IsValidSortModel)
+                return sortRule;
+
+            sortRule.Order = model.SortOrder == QueryModels.SortOrder.Ascending
+                ? Data.Query.SortOrder.Ascending
+                : Data.Query.SortOrder.Descending;
+            DefineSortExpression(sortRule);
+
+            return sortRule;
+        }
+
+        private static PageRule GetPageRule(VideoGameQueryModel model)
+        {
+            var pageRule = new PageRule();
+
+            if (!model.IsValidPageModel)
+                return pageRule;
+
+            pageRule.Index = model.Index;
+            pageRule.Size = model.Size;
+
+            return pageRule;
+        }
+
+        private static void DefineSortExpression(SortRule<VideoGameEntity, int> sortRule)
+        {
+            if (sortRule == null)
+                throw new ArgumentNullException(nameof(sortRule));
+
+            sortRule.Expression = game => game.Title;
         }
     }
 }
